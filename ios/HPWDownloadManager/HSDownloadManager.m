@@ -1,9 +1,8 @@
+
+//  RNDemo
 //
-//  HSDownloadManager.m
-//  HSDownloadManagerExample
-//
-//  Created by hans on 15/8/4.
-//  Copyright © 2015年 hans. All rights reserved.
+//  Created by hupengwei on 2018/3/12.
+//  Copyright © 2018年 Facebook. All rights reserved.
 //
 
 // 缓存主目录

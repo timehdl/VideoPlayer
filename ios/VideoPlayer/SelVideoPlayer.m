@@ -1,17 +1,20 @@
-    //
-//  SelVideoPlayer.m
-//  SelVideoPlayer
-//
-//  Created by zhuku on 2018/1/26.
-//  Copyright © 2018年 selwyn. All rights reserved.
-//
 
+//  RNDemo
+//
+//  Created by hupengwei on 2018/3/12.
+//  Copyright © 2018年 Facebook. All rights reserved.
+//
 #import "SelVideoPlayer.h"
 #import <AVFoundation/AVFoundation.h>
 #import "SelPlayerConfiguration.h"
 #import "SelPlaybackControls.h"
-#import "HPWIndincatorView.h"
 #import "HSDownloadManager.h"
+#import "PlayInfoModel.h"
+#import <SDWebImage/UIImageView+WebCache.h>
+#import <SDWebImage/UIButton+WebCache.h>
+#import <SDWebImage/SDWebImageCompat.h>
+#define  VideoUrl [[NSUserDefaults standardUserDefaults] objectForKey:@"VideoUrl"]
+#define ArrPlayInfoList  [[NSUserDefaults standardUserDefaults] objectForKey:@"PlayInfoList"]
 
 /** 播放器的播放状态 */
 typedef NS_ENUM(NSInteger, SelVideoPlayerState) {
@@ -48,7 +51,7 @@ typedef NS_ENUM(NSUInteger, VideoPlayerStatus) {
 
 @property (nonatomic,strong) NSArray *cacheArr;
 
-@property (nonatomic,strong) NSArray *clarityArr;
+@property (nonatomic,strong) NSMutableArray *clarityArr;
 /// 快进退的总时长
 @property (nonatomic, assign) CGFloat sumTime;
 //几倍速播放数组
@@ -92,7 +95,13 @@ typedef NS_ENUM(NSUInteger, VideoPlayerStatus) {
 
 @implementation SelVideoPlayer
 
-
+-(NSMutableArray *)clarityArr{
+  
+  if (_clarityArr == nil) {
+    _clarityArr = [NSMutableArray arrayWithCapacity:0];
+  }
+  return _clarityArr;
+}
 
 - (ZXVideoPlayerTimeIndicatorView *)timeIndicatorView
 {
@@ -359,11 +368,11 @@ typedef NS_ENUM(NSUInteger, VideoPlayerStatus) {
   }
   if (time != nil) {
     [self.player seekToTime:CMTimeMakeWithSeconds([time floatValue], NSEC_PER_SEC) completionHandler:^(BOOL finished) {
-      
+
     }];
   }
- 
- 
+
+
 
 }
 
@@ -597,8 +606,8 @@ typedef NS_ENUM(NSUInteger, VideoPlayerStatus) {
   if([self.playbackControls.playCacheBtn.titleLabel.text isEqualToString:self.cacheArr.firstObject]){
     
     [self.playbackControls.playCacheBtn setTitle:self.cacheArr.lastObject forState:UIControlStateNormal];
-    if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"urlName"] length] > 0) {
-      [[HSDownloadManager sharedInstance] pause:[[NSUserDefaults standardUserDefaults] objectForKey:@"urlName"]];
+    if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"VideoUrl"] length] > 0) {
+      [[HSDownloadManager sharedInstance] pause:[[NSUserDefaults standardUserDefaults] objectForKey:@"VideoUrl"]];
 
     }
   }else{
@@ -653,17 +662,34 @@ typedef NS_ENUM(NSUInteger, VideoPlayerStatus) {
 
 //清晰度切换
 -(void)playClarityBtnAction{
-  self.clarityArr = @[@"普清", @"高清",@"超清"];
+  [self.clarityArr removeAllObjects];
+  NSArray *arr =  ArrPlayInfoList;
+  for (int i = 0; i < arr.count; i++) {
+    PlayInfoModel *model = [[PlayInfoModel alloc] init];
+    model.Definition = [arr[i] objectForKey:@"Definition"];
+    model.PlayURL = [arr[i] objectForKey:@"PlayURL"];
+
+    [self.clarityArr addObject:model];
+  }
+
   for (int i = 0; i < self.clarityArr.count; i++) {
-    if([[NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] objectForKey:@"clarity"]] isEqualToString:self.clarityArr[i]]){
+    if([[NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] objectForKey:@"clarity"]] isEqualToString:[self.clarityArr[i] Definition]]){
 
-      if([[NSString stringWithFormat:@"%@",self.clarityArr[i]] isEqualToString:self.clarityArr.lastObject]){
+      if([[NSString stringWithFormat:@"%@",[self.clarityArr[i] Definition]] isEqualToString:[self.clarityArr.lastObject Definition]]){
 
-        [[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithFormat:@"%@",self.clarityArr[0]] forKey:@"clarity"];          [self.playbackControls.playClarityBtn setTitle:self.clarityArr[0] forState:UIControlStateNormal];
+        [[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithFormat:@"%@",[self.clarityArr[0] Definition]] forKey:@"clarity"];
+        
+        [self.playbackControls.playClarityBtn setTitle:[self.clarityArr[0] Definition] forState:UIControlStateNormal];
+        [[NSUserDefaults standardUserDefaults] setObject:[self.clarityArr[0] PlayURL] forKey:@"VideoUrl"];
+
+        
       }else{
-        NSLog(@"%@--%@",[[NSUserDefaults standardUserDefaults] objectForKey:@"clarity"],self.clarityArr[i+1]);
-        [[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithFormat:@"%@",self.clarityArr[i+1]] forKey:@"clarity"];
-        [self.playbackControls.playClarityBtn setTitle:self.clarityArr[i+1] forState:UIControlStateNormal];
+        
+        
+        [[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithFormat:@"%@",[self.clarityArr[i+1] Definition]] forKey:@"clarity"];
+        [self.playbackControls.playClarityBtn setTitle:[self.clarityArr[i+1] Definition] forState:UIControlStateNormal];
+        [[NSUserDefaults standardUserDefaults] setObject:[self.clarityArr[i+1] PlayURL] forKey:@"VideoUrl"];
+
 
       }
       break;
@@ -672,9 +698,9 @@ typedef NS_ENUM(NSUInteger, VideoPlayerStatus) {
 
     }
   }
-  if ([[[HSDownloadManager sharedInstance] pathSourceFile:@"http://120.25.226.186:32812/resources/videos/minion_02.mp4"] length] > 0) {//下载完成本地播放
+  if ([[[HSDownloadManager sharedInstance] pathSourceFile:VideoUrl] length] > 0) {//下载完成本地播放
     
-      self.playerItem = [AVPlayerItem playerItemWithURL:[NSURL fileURLWithPath:[[HSDownloadManager sharedInstance] pathSourceFile:@"http://120.25.226.186:32812/resources/videos/minion_02.mp4"] ]];
+      self.playerItem = [AVPlayerItem playerItemWithURL:[NSURL fileURLWithPath:[[HSDownloadManager sharedInstance] pathSourceFile:VideoUrl] ]];
       [self.player replaceCurrentItemWithPlayerItem:self.playerItem];
       [self.player seekToTime:CMTimeMakeWithSeconds(self.playbackControls.videoSlider.value*self.playbackControls.totalTime, 1) toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero completionHandler:^(BOOL finished) {
         [self _playVideo];
@@ -684,7 +710,7 @@ typedef NS_ENUM(NSUInteger, VideoPlayerStatus) {
           if([[NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] objectForKey:@"clarity"]] isEqualToString:@"普清"]){
             
             [self _pauseVideo];
-            _playerConfiguration.sourceUrl = [NSURL URLWithString:@"http://120.25.226.186:32812/resources/videos/minion_02.mp4"];
+            _playerConfiguration.sourceUrl = [NSURL URLWithString:VideoUrl];
             self.playerItem = [AVPlayerItem playerItemWithURL:_playerConfiguration.sourceUrl];
             
             [self.player replaceCurrentItemWithPlayerItem:self.playerItem];
@@ -696,7 +722,7 @@ typedef NS_ENUM(NSUInteger, VideoPlayerStatus) {
           }else if([[NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] objectForKey:@"clarity"]] isEqualToString:@"高清"]){
             
             [self _pauseVideo];
-            _playerConfiguration.sourceUrl = [NSURL URLWithString:@"http://120.25.226.186:32812/resources/videos/minion_02.mp4"];
+            _playerConfiguration.sourceUrl = [NSURL URLWithString:VideoUrl];
             self.playerItem = [AVPlayerItem playerItemWithURL:_playerConfiguration.sourceUrl];
             [self.player replaceCurrentItemWithPlayerItem:self.playerItem];
             [self.player seekToTime:CMTimeMakeWithSeconds(self.playbackControls.videoSlider.value*self.playbackControls.totalTime, 1) toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero completionHandler:^(BOOL finished) {
@@ -705,7 +731,7 @@ typedef NS_ENUM(NSUInteger, VideoPlayerStatus) {
             
           }else{
             
-            _playerConfiguration.sourceUrl = [NSURL URLWithString:@"http://120.25.226.186:32812/resources/videos/minion_02.mp4"];
+            _playerConfiguration.sourceUrl = [NSURL URLWithString:VideoUrl];
             [self _pauseVideo];
             self.playerItem = [AVPlayerItem playerItemWithURL:_playerConfiguration.sourceUrl];
             [self.player replaceCurrentItemWithPlayerItem:self.playerItem];

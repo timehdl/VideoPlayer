@@ -1,11 +1,9 @@
-//
-//  UIViewController+PlayerRotation.h
-//  SelVideoPlayer
-//
-//  Created by zhuku on 2018/1/29.
-//  Copyright © 2018年 selwyn. All rights reserved.
-//
 
+//  RNDemo
+//
+//  Created by hupengwei on 2018/3/12.
+//  Copyright © 2018年 Facebook. All rights reserved.
+//
 #import <UIKit/UIKit.h>
 
 @interface UIViewController (PlayerRotation)

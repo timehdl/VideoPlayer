@@ -1,9 +1,8 @@
+
+//  RNDemo
 //
-//  SelVideoPlayer.h
-//  SelVideoPlayer
-//
-//  Created by zhuku on 2018/1/26.
-//  Copyright © 2018年 selwyn. All rights reserved.
+//  Created by hupengwei on 2018/3/12.
+//  Copyright © 2018年 Facebook. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>

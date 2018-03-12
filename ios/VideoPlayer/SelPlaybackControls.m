@@ -1,14 +1,17 @@
-//
-//  SelBackControl.m
-//  SelVideoPlayer
-//
-//  Created by zhuku on 2018/1/26.
-//  Copyright © 2018年 selwyn. All rights reserved.
-//
 
+//  RNDemo
+//
+//  Created by hupengwei on 2018/3/12.
+//  Copyright © 2018年 Facebook. All rights reserved.
+//
 #import "SelPlaybackControls.h"
 #import <Masonry.h>
 #import <MediaPlayer/MediaPlayer.h>
+#import <SDWebImage/UIImageView+WebCache.h>
+#import <SDWebImage/UIButton+WebCache.h>
+#import <SDWebImage/SDWebImageCompat.h>
+#define UrlPoster [[NSUserDefaults standardUserDefaults] objectForKey:@"Poster"]
+#define ArrPlayInfoList  [[NSUserDefaults standardUserDefaults] objectForKey:@"PlayInfoList"]
 
 static const CGFloat PlaybackControlsAutoHideTimeInterval = 0.3f;
 @interface SelPlaybackControls()
@@ -42,6 +45,7 @@ static const CGFloat PlaybackControlsAutoHideTimeInterval = 0.3f;
     self.bottomControlsBar.alpha = 0;
     self.isShowing = NO;
     [self _activityIndicatorViewShow:YES];
+ 
 }
 
 /**
@@ -78,6 +82,7 @@ static const CGFloat PlaybackControlsAutoHideTimeInterval = 0.3f;
     }
     else
     {
+     
         if (self.isShowing) {
             self.playButton.hidden = NO;
         }
@@ -287,7 +292,7 @@ static const CGFloat PlaybackControlsAutoHideTimeInterval = 0.3f;
 
     }];
   
-  
+//      [_coverImageView sd_setImageWithURL:[NSURL URLWithString:@"http://www.baidu.com/img/bdlogo.png"] placeholderImage:[UIImage imageNamed:@"backImage"]];
   
     [_fullScreenButton mas_makeConstraints:^(MASConstraintMaker *make) {
         make.right.bottom.equalTo(_bottomControlsBar);
@@ -429,7 +434,8 @@ static const CGFloat PlaybackControlsAutoHideTimeInterval = 0.3f;
   
   if (_coverImageView == nil) {
     _coverImageView = [[UIImageView alloc] init];
-    _coverImageView.image = [UIImage imageNamed:@"backImage"];
+   //@"http://www.baidu.com/img/bdlogo.png"
+       [_coverImageView sd_setImageWithURL:[NSURL URLWithString:UrlPoster]];
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(coverClick)];
     _coverImageView.userInteractionEnabled = YES;
     [_coverImageView addGestureRecognizer:tap];
@@ -441,10 +447,11 @@ static const CGFloat PlaybackControlsAutoHideTimeInterval = 0.3f;
 -(UIButton *)playClarityBtn{
   
   if (!_playClarityBtn) {
+    NSArray *arr = ArrPlayInfoList;
     _playClarityBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 40, 20)];
-    [_playClarityBtn setTitle:@"普清" forState:UIControlStateNormal];
+    [_playClarityBtn setTitle:[arr.firstObject objectForKey:@"Definition"] forState:UIControlStateNormal];
      _playClarityBtn.titleLabel.font = [UIFont systemFontOfSize:13];
-    [[NSUserDefaults standardUserDefaults] setObject:@"普清" forKey:@"clarity"];
+    [[NSUserDefaults standardUserDefaults] setObject:[arr.firstObject objectForKey:@"Definition"] forKey:@"clarity"];
     [_playClarityBtn addTarget:self action:@selector(playClarityBtnClick) forControlEvents:UIControlEventTouchDown];
   }
   return _playClarityBtn;

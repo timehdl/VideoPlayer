@@ -1,9 +1,9 @@
 //
-//  SelVideoSlider.m
-//  SelVideoPlayer
+//  SelVideoSlider.h
+//  RNDemo
 //
-//  Created by zhuku on 2018/1/29.
-//  Copyright © 2018年 selwyn. All rights reserved.
+//  Created by hupengwei on 2018/3/12.
+//  Copyright © 2018年 Facebook. All rights reserved.
 //
 
 #import "SelVideoSlider.h"

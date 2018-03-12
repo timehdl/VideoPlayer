@@ -7,12 +7,11 @@
 //
 
 #import "RCTViewManager.h"
-#import "SelVideoPlayer.h"
-#import "SelPlayerConfiguration.h"
-
+#import "Video.h"
 
 @interface VideoManager : RCTViewManager
-@property (nonatomic, strong) SelVideoPlayer *player;
+
 @property (nonatomic, copy) RCTPromiseResolveBlock resolver;
 
+@property (nonatomic,strong) Video *videoView;
 @end
