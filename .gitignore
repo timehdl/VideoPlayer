@@ -3,3 +3,8 @@ node_modules/
 .idea/
 package-lock.json
 yarn.lock
+ios.zip
+android.zip
+.gradle
+android/.idea
+*.iml

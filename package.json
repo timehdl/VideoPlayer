@@ -1,22 +1,19 @@
 {
-  "name": "videoplayer",
-  "version": "0.0.1",
+  "name": "videoplayer-timeh",
+  "version": "0.0.4",
   "description": "视频播放器",
   "main": "index.js",
-  "dependencies": {
-    "react-native": "^0.40.0",
-    "user": "0.0.0"
-  },
+  "dependencies": {},
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git@gitee.com:Time_Hu/VideoPlayer.git"
+    "url": "git@github.com:timehdl/VideoPlayer.git"
   },
   "keywords": [
-    "Video"
+    "Video视频播放器"
   ],
   "author": "Time Hu",
   "license": "ISC"
